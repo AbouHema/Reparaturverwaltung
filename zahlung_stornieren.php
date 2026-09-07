@@ -1,0 +1,4 @@
+<?php
+declare(strict_types=1);
+require_once __DIR__."/db.php";require_once __DIR__."/funktionen.php";require_once __DIR__."/zahlungs_service.php";
+if($_SERVER["REQUEST_METHOD"]!=="POST"){http_response_code(405);die("Ungültige Methode.");}$auftragId=0;try{csrf_pruefen($_POST["csrf_token"]??null);berechtigung_pruefen(["administrator"]);$auftragId=positive_id($_POST["auftrag_id"]??null,"Auftrag");$zahlungId=positive_id($_POST["zahlung_id"]??null,"Zahlung");zahlung_stornieren($pdo,$zahlungId,(string)($_POST["grund"]??""));flash_setzen("success","Die Zahlung wurde nachvollziehbar storniert.");}catch(Throwable $e){flash_setzen("error",$e instanceof EingabeException?$e->getMessage():"Die Zahlung konnte nicht storniert werden.");}weiterleiten($auftragId>0?"bearbeiten.php?id=".$auftragId:"auftraege.php");
